@@ -2,6 +2,7 @@
   "name": "crypton",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://github.dxc.com/pages/lambda/crypton",
   "dependencies": {
     "bootstrap": "^3.3.7",
     "react": "^16.0.0",
