@@ -1,5 +1,7 @@
 import React, {Component} from "react";
 import {Row, Col, Button, Glyphicon, FormGroup, FormControl, ControlLabel} from "react-bootstrap";
+const CryptoJS = require("crypto-js");
+const AES = require("crypto-js/aes");
 
 class CryptonService extends Component {
     constructor(props) {
@@ -10,6 +12,8 @@ class CryptonService extends Component {
             password: ""
         };
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.encrypt = this.encrypt.bind(this);
+        this.decrypt = this.decrypt.bind(this);
     }
     handleInputChange(event) {
         const target = event.target;
@@ -22,11 +26,15 @@ class CryptonService extends Component {
     }
 
     encrypt(event) {
-
+        this.setState({
+            encryptedMessage: AES.encrypt(this.state.message, this.state.password)
+        });
     }
 
     decrypt(event) {
-
+        this.setState({
+            message: AES.decrypt(CryptoJS.enc.Base64.parse(this.state.encyrptedMessage), this.state.password).toString(CryptoJS.enc.Utf8)
+        });
     }
 
     render() {
