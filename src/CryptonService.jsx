@@ -2,14 +2,16 @@ import React, {Component} from "react";
 import {Row, Col, Button, Glyphicon, FormGroup, FormControl, ControlLabel} from "react-bootstrap";
 const CryptoJS = require("crypto-js");
 const AES = require("crypto-js/aes");
+const passwordGenerator = require("generate-password");
 
 class CryptonService extends Component {
     constructor(props) {
         super(props);
         this.state = {
             message: "",
-            encyrptedMessage: "",
-            password: ""
+            encryptedMessage: "",
+            password: "",
+            passwordType: "password"
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.encrypt = this.encrypt.bind(this);
@@ -22,28 +24,64 @@ class CryptonService extends Component {
         this.setState({
             [name]: value
         });
-        console.log(this.state);
+        // console.log(this.state);
     }
 
-    encrypt(event) {
+    showPassword() {
+        if (this.state.passwordType === "password") {
+            this.setState({passwordType: "text"});
+        } else {
+            this.setState({passwordType: "password"});
+        }
+    }
+
+    generatePassword() {
         this.setState({
-            encryptedMessage: AES.encrypt(this.state.message, this.state.password)
+            password: passwordGenerator.generate({
+                length: 18,
+                numbers: true,
+                symbols: true,
+                excludeSimilarCharacters: true,
+                strict: true
+            })
         });
     }
 
-    decrypt(event) {
+    encrypt() {
         this.setState({
-            message: AES.decrypt(CryptoJS.enc.Base64.parse(this.state.encyrptedMessage), this.state.password).toString(CryptoJS.enc.Utf8)
+            encryptedMessage: AES.encrypt(this.state.message, this.state.password).toString()
+        });
+    }
+
+    decrypt() {
+        let decrypted = AES.decrypt(this.state.encryptedMessage, this.state.password).toString(CryptoJS.enc.Utf8);
+        if (!decrypted) {
+            decrypted = "Decryption failed! You're using an incorrect password.";
+        }
+        this.setState({
+            message: decrypted
         });
     }
 
     render() {
+        function ShowPwdBtn(props) {
+            if (props.passwordType === "password") {
+                return (
+                    <Button bsStyle="info" onClick={props.onClick}>
+                        <Glyphicon glyph="eye-open"/> Show password
+                    </Button>
+                );
+            } else {
+                return (
+                    <Button bsStyle="info" onClick={props.onClick}>
+                        <Glyphicon glyph="eye-close"/> Hide password
+                    </Button>
+                );
+            }
+
+        }
         return (
             <main>
-                <div>
-                    <h2>Service</h2>
-                    <hr/>
-                </div>
                 <div className="container">
                     <Row>
                         <Col sm={12}>
@@ -51,12 +89,18 @@ class CryptonService extends Component {
                                 <ControlLabel>Password</ControlLabel>
                                 <FormControl
                                     name="password"
-                                    type="password"
+                                    type={this.state.passwordType}
                                     value={this.state.password}
                                     placeholder="Enter Password"
                                     onChange={this.handleInputChange}
                                 />
                             </FormGroup>
+                            <ShowPwdBtn onClick={this.showPassword.bind(this)} passwordType={this.state.passwordType} />
+                            <span style={{marginRight: "10px"}}></span>
+                            <Button bsStyle="default" onClick={this.generatePassword.bind(this)}>
+                                Generate password
+                            </Button>
+                            <div style={{marginBottom:"20px"}}></div>
                         </Col>
                     </Row>
                     <Row>
@@ -74,6 +118,7 @@ class CryptonService extends Component {
                             </FormGroup>
                         </Col>
                         <Col sm={2}>
+                            <div style={{marginTop: "30px"}}></div>
                             <Button
                                 bsStyle="primary"
                                 bsSize="large"
@@ -82,6 +127,7 @@ class CryptonService extends Component {
                             >
                                 <Glyphicon glyph="lock" /> Encrypt
                             </Button>
+                            <hr/>
                             <Button
                                 bsStyle="success"
                                 bsSize="large"

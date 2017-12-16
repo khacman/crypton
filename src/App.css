@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  text-align: left;
 }
 
 .App-logo {
@@ -16,6 +16,7 @@
 .jumbotron {
   background-color: #222;
   color: white;
+  text-align: center;
 }
 
 .App-title {
